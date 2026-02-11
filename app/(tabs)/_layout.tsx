@@ -1,35 +1,121 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs } from "expo-router";
+import {
+  ImageBackground,
+  Image,
+  Text,
+  View,
+  StyleSheet,
+  ImageSourcePropType,
+} from "react-native";
+import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+type TabIconProps = {
+  focused: boolean;
+  icon: ImageSourcePropType;
+  title: string;
+};
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+const TabIcon = ({ focused, icon, title }: TabIconProps) => {
+  if (focused) {
+    return (
+      <ImageBackground
+        source={images.highlight}
+        style={styles.focusedContainer}
+        imageStyle={styles.imageBackground}
+      >
+        <Image source={icon} tintColor="#151312" style={styles.icon} />
+        <Text style={styles.focusedText}>{title}</Text>
+      </ImageBackground>
+    );
+  }
 
+  return (
+    <View style={styles.unfocusedContainer}>
+      <Image source={icon} tintColor="#A8B5DB" style={styles.icon} />
+    </View>
+  );
+};
+
+const tabs = [
+  { name: "index", title: "Home", icon: icons.home },
+  { name: "Search", title: "Search", icon: icons.search },
+  { name: "Saved", title: "Saved", icon: icons.save },
+  { name: "Profile", title: "Profile", icon: icons.person },
+];
+
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
+        tabBarShowLabel: false,
+        tabBarItemStyle: {
+          width: "100%",
+          height: "100%",
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        tabBarStyle: {
+          backgroundColor: "#0F0D23",
+          borderRadius: 50,
+          marginHorizontal: 20,
+          marginBottom: 36,
+          height: 52,
+          position: "absolute",
+          overflow: "hidden",
+          borderWidth: 1,
+          borderColor: "#0F0D23",
+        },
+      }}
+    >
+      {tabs.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.title,
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <TabIcon focused={focused} icon={tab.icon} title={tab.title} />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  focusedContainer: {
+    flexDirection: "row",
+    width: "100%",
+    flex: 1,
+    minWidth: 112,
+    minHeight: 56,
+    marginTop: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  imageBackground: {
+    borderRadius: 9999,
+  },
+  unfocusedContainer: {
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 16,
+    borderRadius: 9999,
+  },
+  icon: {
+    width: 20,
+    height: 20,
+  },
+  focusedText: {
+    color: "#151312",
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
+  },
+});
