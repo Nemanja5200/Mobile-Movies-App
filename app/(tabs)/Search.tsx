@@ -4,9 +4,8 @@ import SearchInput from "@/components/SearchInput";
 import { COLORS } from "@/constants/colors";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
-import { Movie } from "@/types/TMBDTypes";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -19,18 +18,29 @@ import {
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Debounce search
-  const debounce = useCallback((text: string) => {
-    const timeoutId = setTimeout(() => {
-      setDebouncedQuery(text);
+  useEffect(() => {
+    // Clear previous timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Set new timeout
+    timeoutRef.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
     }, 500);
-    return () => clearTimeout(timeoutId);
-  }, []);
+
+    // Cleanup on unmount
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
 
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
-    debounce(text);
   };
 
   const handleClear = () => {
@@ -48,10 +58,7 @@ const Search = () => {
     enabled: debouncedQuery.length > 0,
   });
 
-  const {
-    data: trendingMovies,
-    isLoading: isTrendingLoading,
-  } = useQuery({
+  const { data: trendingMovies, isLoading: isTrendingLoading } = useQuery({
     queryKey: ["trendingMovies"],
     queryFn: () => tmdbService.getTrendingMovies("week"),
   });
