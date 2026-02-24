@@ -22,6 +22,13 @@ import {
   TVShowsResponse,
 } from "@/types/TMBDTypes";
 import { getResponseType, TMBD_RESPONCE_TYPE } from "@/utils/utils";
+import { IMAGE_HOME_URL, IMAGE_POSTER_URL } from "@/constants/constants/Links";
+
+const buildImageUrl = (path: string | null, size: "small" | "large" = "small"): string | null => {
+  if (!path) return null;
+  const baseUrl = size === "large" ? IMAGE_POSTER_URL : IMAGE_HOME_URL;
+  return `${baseUrl}${path}`;
+};
 
 export const ParseTMDBResponse = <
   T extends RawMediaResponse | RawDetailsResponse,
@@ -62,13 +69,13 @@ export const ParseTMDBResponse = <
 const ParseMovie = (rawMovie: RawMovie): Movie => ({
   id: rawMovie.id,
   title: rawMovie.title,
-  poster: rawMovie.poster_path,
+  poster: buildImageUrl(rawMovie.poster_path),
 });
 
 const ParseTVShow = (rawTVShow: RawTVShow): TVShow => ({
   id: rawTVShow.id,
   title: rawTVShow.name,
-  poster: rawTVShow.poster_path,
+  poster: buildImageUrl(rawTVShow.poster_path),
 });
 
 const ParseMovieDetails = (rawDetails: RawDetails): Details => ({
@@ -76,8 +83,8 @@ const ParseMovieDetails = (rawDetails: RawDetails): Details => ({
   genre: rawDetails.genres[0]?.name || "Unknown",
   country: rawDetails.origin_country[0] || "Unknown",
   duration: rawDetails.runtime,
-  heroPoster: rawDetails.backdrop_path || "",
-  poster: rawDetails.poster_path || "",
+  heroPoster: buildImageUrl(rawDetails.backdrop_path, "large") || "",
+  poster: buildImageUrl(rawDetails.poster_path) || "",
   rating: rawDetails.vote_average,
   overview: rawDetails.overview,
   release_date: rawDetails.release_date,
@@ -88,8 +95,8 @@ const ParseSeriesDetails = (rawDetails: RawSeriesDetails): Details => ({
   genre: rawDetails.genres[0]?.name || "Unknown",
   country: rawDetails.origin_country[0] || "Unknown",
   duration: rawDetails.number_of_seasons,
-  heroPoster: rawDetails.backdrop_path || "",
-  poster: rawDetails.poster_path || "",
+  heroPoster: buildImageUrl(rawDetails.backdrop_path, "large") || "",
+  poster: buildImageUrl(rawDetails.poster_path) || "",
   rating: rawDetails.vote_average,
   overview: rawDetails.overview,
   release_date: rawDetails.first_air_date,
@@ -99,7 +106,7 @@ const ParseCastMember = (rawCast: RawCastMember): CastMember => ({
   id: rawCast.id,
   name: rawCast.name,
   character: rawCast.character,
-  profilePath: rawCast.profile_path,
+  profilePath: buildImageUrl(rawCast.profile_path),
 });
 
 const ParseCrewMember = (rawCrew: RawCrewMember): CrewMember => ({
