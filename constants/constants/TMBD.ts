@@ -7,4 +7,5 @@ export const TMBD_ROUTE = {
   SDETAILS: "/tv/",
   MOViE_CREDITS: "movie/{id}/credits",
   SERIES_CREDITS: "tv/{id}/credits",
+  SEARCH_MOVIES: "/search/movie",
 };

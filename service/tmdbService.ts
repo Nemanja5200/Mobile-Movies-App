@@ -75,4 +75,11 @@ export const tmdbService = {
     );
     return ParseTMDBResponse(response.data) as CreditsResponse;
   },
+
+  searchMovies: async (query: string, page: number = 1): Promise<MoviesResponse> => {
+    const response = await api.get<RawMovieResponse>(TMBD_ROUTE.SEARCH_MOVIES, {
+      params: { query, page },
+    });
+    return ParseTMDBResponse(response.data) as MoviesResponse;
+  },
 };
